@@ -1,0 +1,75 @@
+// Meldeleuchten
+
+// Meldeleuchte "Anlage EIN"
+IF #"Anlage EIN/AUS" = TRUE THEN
+    #"ML_Anlage Ein" := TRUE;
+ELSE
+    #"ML_Anlage Ein" := FALSE;
+END_IF;
+
+// Meldeleuchte "waagerecht"
+IF (#OUT > 13271,04) AND (#OUT < 14376,96) THEN
+    #ML_waagrecht := TRUE;
+ELSE
+    #ML_waagrecht := FALSE;
+END_IF;
+
+// Meldeleuchte "Störung"
+IF (#"Anlage EIN/AUS" = TRUE AND #"MSS -M1" = FALSE) THEN
+    #ML_Störung := TRUE;
+ELSIF #"Anlage EIN/AUS" = TRUE AND #"MSS -M1" = TRUE AND #"Störung quittieren" THEN
+    #ML_Störung := FALSE;
+END_IF;
+
+
+// Ventile
+ 
+// Ventil "M3"
+IF (#Start AND #"Anlage EIN/AUS" AND #"MSS -M1") OR (#"Störung quittieren" AND #"Zähler Auswurf" < 3) THEN
+    #"Ventil M3" := TRUE;
+ELSIF NOT #"MSS -M1" THEN
+    #"Ventil M3" := FALSE;
+END_IF;
+    
+// Ventil "M4"
+IF #"Zähler Auswurf" = 3 THEN
+    #"Ventil M3" := FALSE;
+    #"Ventil M4" := TRUE;
+    #"Zähler Auswurf" := 0;
+ELSIF #"Sensor Behälter 1" OR NOT #"MSS -M1" THEN
+    #"Ventil M4" := FALSE;
+END_IF;
+
+
+//Schütze
+
+//Schütz "Q1"
+IF #"Anlage EIN/AUS" AND #"MSS -M1" THEN
+    #"Schütz M1" := TRUE;
+ELSIF NOT #"MSS -M1" THEN
+    #"Schütz M1" := FALSE;
+END_IF;
+    
+    
+// Zähler
+
+// Zähler Auswurf
+#"Zähler Auswurf" := 0;
+WHILE #"Ventil M3" AND #"Zähler Auswurf" < 3 DO
+    #"Zähler Auswurf" := #"Zähler Auswurf" + #"Sensor Teil auf Waage";
+END_WHILE;
+
+    
+//Analowertverarbeitung
+
+#IN := #"Sensor Wippe waagerecht";  // analoges Signal wird in "IN" beschrieben
+
+#IN_REAL  := INT_TO_REAL(#IN);
+#IN_HIGH  := INT_TO_REAL(#IN_MAX);
+#IN_LOW   := INT_TO_REAL(#IN_MIN);
+#OUT_HIGH := INT_TO_REAL(#OUT_MAX);
+#OUT_LOW  := INT_TO_REAL(#OUT_MIN);
+
+#OUT      := ((#OUT_HIGH-#OUT_LOW)*(#IN_REAL-#IN_LOW)/#IN_HIGH-#IN_LOW)+#OUT_LOW;
+    
+    
