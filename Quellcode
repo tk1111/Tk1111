@@ -14,49 +14,49 @@ ELSE
     #ML_waagrecht := FALSE;
 END_IF;
 
-// Meldeleuchte "Störung"
+// Meldeleuchte "StÃ¶rung"
 IF (#"Anlage EIN/AUS" = TRUE AND #"MSS -M1" = FALSE) THEN
-    #ML_Störung := TRUE;
-ELSIF #"Anlage EIN/AUS" = TRUE AND #"MSS -M1" = TRUE AND #"Störung quittieren" THEN
-    #ML_Störung := FALSE;
+    #ML_StÃ¶rung := TRUE;
+ELSIF #"Anlage EIN/AUS" = TRUE AND #"MSS -M1" = TRUE AND #"StÃ¶rung quittieren" THEN
+    #ML_StÃ¶rung := FALSE;
 END_IF;
 
 
 // Ventile
  
 // Ventil "M3"
-IF (#Start AND #"Anlage EIN/AUS" AND #"MSS -M1") OR (#"Störung quittieren" AND #"Zähler Auswurf" < 3) THEN
+IF (#Start AND #"Anlage EIN/AUS" AND #"MSS -M1") OR (#"StÃ¶rung quittieren" AND #"ZÃ¤hler Auswurf" < 3) THEN
     #"Ventil M3" := TRUE;
 ELSIF NOT #"MSS -M1" THEN
     #"Ventil M3" := FALSE;
 END_IF;
     
 // Ventil "M4"
-IF #"Zähler Auswurf" = 3 THEN
+IF #"ZÃ¤hler Auswurf" = 3 THEN
     #"Ventil M3" := FALSE;
     #"Ventil M4" := TRUE;
-    #"Zähler Auswurf" := 0;
-ELSIF #"Sensor Behälter 1" OR NOT #"MSS -M1" THEN
+    #"ZÃ¤hler Auswurf" := 0;
+ELSIF #"Sensor BehÃ¤lter 1" OR NOT #"MSS -M1" THEN
     #"Ventil M4" := FALSE;
 END_IF;
 
 
-//Schütze
+//SchÃ¼tze
 
-//Schütz "Q1"
+//SchÃ¼tz "Q1"
 IF #"Anlage EIN/AUS" AND #"MSS -M1" THEN
-    #"Schütz M1" := TRUE;
+    #"SchÃ¼tz M1" := TRUE;
 ELSIF NOT #"MSS -M1" THEN
-    #"Schütz M1" := FALSE;
+    #"SchÃ¼tz M1" := FALSE;
 END_IF;
     
     
-// Zähler
+// ZÃ¤hler
 
-// Zähler Auswurf
-#"Zähler Auswurf" := 0;
-WHILE #"Ventil M3" AND #"Zähler Auswurf" < 3 DO
-    #"Zähler Auswurf" := #"Zähler Auswurf" + #"Sensor Teil auf Waage";
+// ZÃ¤hler Auswurf
+#"ZÃ¤hler Auswurf" := 0;
+WHILE #"Ventil M3" AND #"ZÃ¤hler Auswurf" < 3 DO
+    #"ZÃ¤hler Auswurf" := #"ZÃ¤hler Auswurf" + #"Sensor Teil auf Waage";
 END_WHILE;
 
     
